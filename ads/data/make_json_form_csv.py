@@ -1,45 +1,30 @@
 import csv
 import json
 
-with open('categories.csv') as file:
-    categories = list(csv.reader(file))
-    del categories[0]
 
-result_1 = []
-for category_data in categories:
-    result_1.append(
-        {
-            "model": "ads.category",
-            "pk": int(category_data[0]),
-            "fields": {
-                "name": category_data[1],
+def create_json(csv_path, json_path, model):
+    with open(csv_path) as file:
+        dict_ = csv.DictReader(file)
+        result = []
+        for object_ in dict_:
+            object_dict = {
+                'model': model,
+                'pk': object_['id'],
+                'fields': object_
             }
-        })
+            del object_dict['fields']['id']
+            if 'is_published' in object_dict['fields']:
+                if object_dict['fields']['is_published'] == 'TRUE':
+                    object_dict['fields']['is_published'] = True
+                else:
+                    object_dict['fields']['is_published'] = False
+            result.append(object_dict)
 
-with open('../fixtures/categories.json', 'w') as file:
-    json.dump(result_1, file)
+    with open(f'../fixtures/{json_path}', 'w') as file:
+        json.dump(result, file, ensure_ascii=False)
 
 
-
-with open('ads.csv') as file:
-    ads = list(csv.reader(file))
-    del ads[0]
-
-result_2 = []
-for category_data in ads:
-    result_2.append(
-        {
-            "model": "ads.ads",
-            "pk": int(category_data[0]),
-            "fields": {
-                "name": category_data[1],
-                'author': category_data[2],
-                'price': int(category_data[3]),
-                'description': category_data[4],
-                'address': category_data[5],
-                'is_published': True if category_data[6] == 'TRUE' else False,
-            }
-        })
-
-with open('../fixtures/ads.json', 'w') as file:
-    json.dump(result_2, file)
+create_json('ad.csv', 'ad.json', 'ads.ad')
+create_json('category.csv', 'category.json', 'ads.category')
+create_json('location.csv', 'location.json', 'ads.location')
+create_json('user.csv', 'user.json', 'ads.user')

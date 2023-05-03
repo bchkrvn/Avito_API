@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
 
 from ads.forms import AdForm, CategoryForm
-from ads.models import Category, ADS
+from ads.models import Category, Ad
 
 
 def ok_view(request):
@@ -62,7 +62,7 @@ class AdsView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class AdDetailView(DetailView):
-    model = ADS
+    model = Ad
 
     def get(self, request, *args, **kwargs):
         return JsonResponse(self.get_object().json_full())
