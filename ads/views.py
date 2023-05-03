@@ -10,9 +10,6 @@ from ads.forms import AdForm, CategoryForm
 from ads.models import Category, Ad
 
 
-def ok_view(request):
-    return JsonResponse({"status": "ok"})
-
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CategoriesView(View):
