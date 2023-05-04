@@ -2,12 +2,12 @@ import json
 
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 
-from ads.forms import AdCreateForm, AdUpdateForm
 from ads.models import Ad
 
 
@@ -56,56 +56,67 @@ class AdDetailView(DetailView):
 @method_decorator(csrf_exempt, name="dispatch")
 class AdCreateView(CreateView):
     model = Ad
-    form_class = AdCreateForm
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
-        form = self.form_class(data=data)
 
-        if form.is_valid():
+        try:
             ad = Ad()
-            form_data = form.cleaned_data
-            ad.name = form_data['name']
-            ad.price = form_data['price']
-            ad.description = form_data['description']
-            ad.is_published = form_data['is_published']
-            ad.author = form_data['author']
-            ad.category = form_data['category']
+            ad.name = data['name']
+            ad.price = data['price']
+            ad.description = data['description']
+            ad.is_published = data['is_published']
+            ad.author_id = data['author_id']
+            ad.category_id = data['category_id']
             ad.save()
             return JsonResponse(ad.json_short(), status=201)
-        else:
-            return JsonResponse({'error': 'wrong data'}, status=404)
+
+        except (KeyError, ValidationError):
+            return JsonResponse({'error': f'Wrong data'}, status=404)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class AdUpdateView(UpdateView):
     model = Ad
-    fields = ['name', 'author', 'price', 'description', 'is_published', 'image', 'category']
 
     def patch(self, request, *args, **kwargs):
         super().post(self, request, *args, **kwargs)
         data = json.loads(request.body)
-        form = AdUpdateForm(data=data)
 
-        if form.is_valid():
-            ad = self.get_object()
-            form_data = form.cleaned_data
-
-            if 'name' in form_data:
-                ad.name = form_data['name']
-            if 'price' in form_data:
-                ad.price = form_data['price']
-            if 'description' in form_data:
-                ad.description = form_data['description']
-            if 'is_published' in form_data:
-                ad.is_published = form_data['is_published']
-            if 'category' in form_data:
-                ad.category = form_data['category']
-
+        try:
+            ad = Ad()
+            if 'name' in data:
+                ad.name = data['name']
+            if 'price' in data:
+                ad.price = data['price']
+            if 'description' in data:
+                ad.description = data['description']
+            if 'is_published' in data:
+                ad.is_published = data['is_published']
+            if 'author_id' in data:
+                ad.author_id = data['author_id']
+            if 'category_id' in data:
+                ad.category_id = data['category_id']
             ad.save()
-            return JsonResponse(ad.json_full(), status=201)
-        else:
-            return JsonResponse({'error': 'wrong data'}, status=404)
+            return JsonResponse(ad.json_short(), status=201)
+
+        except ValidationError:
+            return JsonResponse({'error': f'Wrong data'}, status=404)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class AdImageUploadView(UpdateView):
+    model = Ad
+    fields = ['name', 'author', 'price', 'description', 'is_published', 'image', 'category']
+
+    def post(self, request, *args, **kwargs):
+        ad = self.get_object()
+        img = request.FILES['image']
+        img.name = f'post{ad.id}.jpg'
+        ad.image = img
+        ad.save()
+
+        return JsonResponse({'id': ad.id, 'image': ad.image.url})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
