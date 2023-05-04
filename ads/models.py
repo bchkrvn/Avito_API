@@ -5,7 +5,7 @@ class Category(models.Model):
     name = models.CharField(max_length=25)
 
     def json(self):
-        return {'id': self.id, 'name': self.name}
+        return {'name': self.name}
 
     def __repr__(self):
         return f'Category({self.name})'
@@ -39,7 +39,7 @@ class User(models.Model):
     ]
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-    username = models.CharField(max_length=20, null=False)
+    username = models.CharField(max_length=20, null=False, unique=True)
     password = models.CharField(max_length=20, null=False)
     role = models.CharField(max_length=10, choices=ROLES)
     age = models.IntegerField()
@@ -49,8 +49,8 @@ class User(models.Model):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
-    def json(self):
-        return {}
+    def json_short(self):
+        return {'first_name': self.first_name, 'last_name': self.last_name, 'username': self.username}
 
     def __str__(self):
         return f'User({self.username})'
@@ -77,7 +77,8 @@ class Ad(models.Model):
                 'description': self.description, 'is_published': self.is_published}
 
     def json_short(self):
-        return {'id': self.id, 'name': self.name, 'author': self.author, 'price': self.price}
+        return {'id': self.id, 'name': self.name, 'author_id': self.author_id, 'price': self.price,
+                'category_id': self.category_id, 'image': self.image.url if self.image else None}
 
     def __repr__(self):
         return f'Ads({self.name})'
