@@ -6,7 +6,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
 
-from ads.forms import AdForm, CategoryForm
+from ads.forms import AdCreateForm, CategoryForm
 from ads.models import Category, Ad
 
 
@@ -48,7 +48,7 @@ class AdsView(View):
 
     def post(self, request):
         data = json.loads(request.body)
-        form = AdForm(data=data)
+        form = AdCreateForm(data=data)
 
         if form.is_valid():
             ad = form.save()

@@ -6,9 +6,8 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
-from django.forms import ValidationError
 
-from ads.forms import AdForm
+from ads.forms import AdCreateForm, AdUpdateForm
 from ads.models import Ad
 
 
@@ -40,7 +39,6 @@ class AdDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         ad = self.get_object()
-        print(ad)
 
         response = {
             'name': ad.name,
@@ -48,7 +46,7 @@ class AdDetailView(DetailView):
             'price': ad.price,
             'description': ad.description,
             'is_published': ad.is_published,
-            'image': ad.image.url,
+            'image': ad.image.url if ad.image else None,
             'category': ad.category.json(),
         }
 
@@ -58,37 +56,54 @@ class AdDetailView(DetailView):
 @method_decorator(csrf_exempt, name="dispatch")
 class AdCreateView(CreateView):
     model = Ad
-    form_class = AdForm
+    form_class = AdCreateForm
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         form = self.form_class(data=data)
 
         if form.is_valid():
-            ad = form.save(commit=False)
-            ad.author = form.clean_author()
-            ad.category = form.clean_category()
+            ad = Ad()
+            form_data = form.cleaned_data
+            ad.name = form_data['name']
+            ad.price = form_data['price']
+            ad.description = form_data['description']
+            ad.is_published = form_data['is_published']
+            ad.author = form_data['author']
+            ad.category = form_data['category']
             ad.save()
             return JsonResponse(ad.json_short(), status=201)
         else:
             return JsonResponse({'error': 'wrong data'}, status=404)
 
-        # except ValidationError as e:
-        #     return JsonResponse({'error': e.message}, status=404)
-
 
 @method_decorator(csrf_exempt, name="dispatch")
 class AdUpdateView(UpdateView):
     model = Ad
-    form_class = AdForm
+    fields = ['name', 'author', 'price', 'description', 'is_published', 'image', 'category']
 
     def patch(self, request, *args, **kwargs):
+        super().post(self, request, *args, **kwargs)
         data = json.loads(request.body)
-        form = self.form_class(data=data, instance=self.get_object())
+        form = AdUpdateForm(data=data)
 
         if form.is_valid():
-            category = form.save()
-            return JsonResponse(category.json(), status=204)
+            ad = self.get_object()
+            form_data = form.cleaned_data
+
+            if 'name' in form_data:
+                ad.name = form_data['name']
+            if 'price' in form_data:
+                ad.price = form_data['price']
+            if 'description' in form_data:
+                ad.description = form_data['description']
+            if 'is_published' in form_data:
+                ad.is_published = form_data['is_published']
+            if 'category' in form_data:
+                ad.category = form_data['category']
+
+            ad.save()
+            return JsonResponse(ad.json_full(), status=201)
         else:
             return JsonResponse({'error': 'wrong data'}, status=404)
 

@@ -73,7 +73,7 @@ class Ad(models.Model):
     published = PublishedManager()
 
     def json_full(self):
-        return {'id': self.id, 'name': self.name, 'author': self.author, 'price': self.price,
+        return {'id': self.id, 'name': self.name, 'author': self.author.id, 'price': self.price,
                 'description': self.description, 'is_published': self.is_published}
 
     def json_short(self):
