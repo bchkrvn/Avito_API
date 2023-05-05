@@ -15,7 +15,7 @@ class CategoryListView(ListView):
     model = Category
 
     def get(self, request, *args, **kwargs):
-        paginator = Paginator(self.get_queryset(), settings.TOTAL_ON_PAGE)
+        paginator = Paginator(self.get_queryset().order_by('name'), settings.TOTAL_ON_PAGE)
         page_number = request.GET.get('page', 1)
         try:
             categories = paginator.page(page_number)

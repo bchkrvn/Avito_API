@@ -16,9 +16,9 @@ class Category(models.Model):
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=100)
-    lat = models.FloatField()
-    lng = models.FloatField()
+    name = models.CharField(max_length=100, unique=True)
+    lat = models.FloatField(null=True)
+    lng = models.FloatField(null=True)
 
     def json(self):
         return {"name": self.name, 'lat': self.lat, 'lng': self.lng}
@@ -41,9 +41,9 @@ class User(models.Model):
     last_name = models.CharField(max_length=20)
     username = models.CharField(max_length=20, null=False, unique=True)
     password = models.CharField(max_length=20, null=False)
-    role = models.CharField(max_length=10, choices=ROLES)
+    role = models.CharField(max_length=10, choices=ROLES, default='member')
     age = models.IntegerField()
-    location_id = models.ForeignKey(Location, on_delete=models.CASCADE, default='member')
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = 'Пользователь'

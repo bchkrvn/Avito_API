@@ -4,5 +4,6 @@ from ads.models import Category
 
 
 class CategoryForm(ModelForm):
-    model = Category
-    fields = ['name']
+    class Meta:
+        model = Category
+        fields = ['name']

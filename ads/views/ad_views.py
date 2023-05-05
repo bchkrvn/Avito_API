@@ -13,7 +13,7 @@ from ads.models import Ad
 
 class AdListView(ListView):
     model = Ad
-    queryset = Ad.published.all()
+    queryset = Ad.published.order_by('-price').all()
 
     def get(self, request, *args, **kwargs):
         paginator = Paginator(self.get_queryset(), settings.TOTAL_ON_PAGE)
