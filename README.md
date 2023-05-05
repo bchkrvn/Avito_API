@@ -20,8 +20,8 @@
 3) После этого вернитесь в каталог **HW_27** и выполните команды:  
 `python3 manage.py migrate`  
 `python3 manage.py loaddata location.json`  
-`python3 manage.py loaddata category.json`
-`python3 manage.py loaddata user.json`
+`python3 manage.py loaddata category.json`  
+`python3 manage.py loaddata user.json`  
 `python3 manage.py loaddata ad.json`
 4) Для запуска сервера выполните команду:  
 `python3 manage.py runserver`
