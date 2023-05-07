@@ -78,13 +78,14 @@ class AdCreateView(CreateView):
 @method_decorator(csrf_exempt, name="dispatch")
 class AdUpdateView(UpdateView):
     model = Ad
+    fields = '__all__'
 
     def patch(self, request, *args, **kwargs):
         super().post(self, request, *args, **kwargs)
         data = json.loads(request.body)
 
         try:
-            ad = Ad()
+            ad = self.get_object()
             if 'name' in data:
                 ad.name = data['name']
             if 'price' in data:
@@ -107,12 +108,13 @@ class AdUpdateView(UpdateView):
 @method_decorator(csrf_exempt, name="dispatch")
 class AdImageUploadView(UpdateView):
     model = Ad
-    fields = ['name', 'author', 'price', 'description', 'is_published', 'image', 'category']
+    fields = "__all__"
 
     def post(self, request, *args, **kwargs):
         ad = self.get_object()
         img = request.FILES['image']
-        img.name = f'post{ad.id}.jpg'
+        extension = img.name.rsplit('.', 1)[1].lower()
+        img.name = f'post{ad.id}.{extension}'
         ad.image = img
         ad.save()
 
