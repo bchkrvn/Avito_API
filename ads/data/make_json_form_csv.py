@@ -13,11 +13,18 @@ def create_json(csv_path, json_path, model):
                 'fields': object_
             }
             del object_dict['fields']['id']
+
             if 'is_published' in object_dict['fields']:
                 if object_dict['fields']['is_published'] == 'TRUE':
                     object_dict['fields']['is_published'] = True
                 else:
                     object_dict['fields']['is_published'] = False
+
+            if 'location_id' in object_dict['fields']:
+                object_dict['fields']['locations'] = list()
+                object_dict['fields']['locations'].append(int(object_dict['fields']['location_id']))
+                del object_dict['fields']['location_id']
+
             result.append(object_dict)
 
     with open(f'../fixtures/{json_path}', 'w') as file:
