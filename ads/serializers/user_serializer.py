@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = super().save()
 
         if self._locations is not None:
+            user.locations.clear()
             for location in self._locations:
                 location_obj, _ = Location.objects.get_or_create(name=location)
                 user.locations.add(location_obj)
