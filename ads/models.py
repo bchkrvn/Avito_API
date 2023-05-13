@@ -47,11 +47,6 @@ class User(models.Model):
         return f'User({self.username})'
 
 
-class PublishedManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_published=True)
-
-
 class Ad(models.Model):
     name = models.CharField(max_length=50)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -60,8 +55,6 @@ class Ad(models.Model):
     is_published = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-
-    published = PublishedManager()
 
     def __repr__(self):
         return f'Ads({self.name})'

@@ -19,16 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
         self._locations = self.initial_data.pop('locations') if 'locations' in self.initial_data else None
         return super().is_valid(raise_exception=raise_exception)
 
-    def create(self, validated_data):
-        user = User.objects.create(**validated_data)
-        if self._locations is not None:
-            for location in self._locations:
-                location_obj, _ = Location.objects.get_or_create(name=location)
-                user.locations.add(location_obj)
-
-        user.save()
-        return user
-
     def save(self):
         user = super().save()
 

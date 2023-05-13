@@ -26,10 +26,12 @@ class AdImageUploadView(UpdateView):
 
 
 class AdGenericViewSet(viewsets.GenericViewSet):
-    queryset = Ad.published.select_related('author').select_related('category').all()
+    queryset = Ad.objects.select_related('author').select_related('category').all()
     serializer_class = AdSerializer
 
     def list(self, request):
+        queryset = self.queryset.filter(is_published=True).order_by('-price')
+
         category = request.GET.get('cat')
         text = request.GET.get('text')
         location = request.GET.get('location')
@@ -37,17 +39,16 @@ class AdGenericViewSet(viewsets.GenericViewSet):
         price_to = request.GET.get('price_to')
 
         if category:
-            self.queryset = self.get_queryset().filter(category=category)
+            queryset = queryset.filter(category=category)
         if text:
-            self.queryset = self.get_queryset().filter(name__icontains=text)
+            queryset = queryset.filter(name__icontains=text)
         if location:
-            self.queryset = self.get_queryset().filter(author__locations__name__icontains=location)
+            queryset = queryset.filter(author__locations__name__icontains=location)
         if price_from:
-            self.queryset = self.get_queryset().filter(price__gte=price_from)
+            queryset = queryset.filter(price__gte=price_from)
         if price_to:
-            self.queryset = self.get_queryset().filter(price__lte=price_to)
+            queryset = queryset.filter(price__lte=price_to)
 
-        queryset = self.get_queryset().order_by('-price')
         serializer = self.get_serializer(queryset, many=True)
         return self.get_paginated_response(self.paginate_queryset(serializer.data))
 
