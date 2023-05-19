@@ -1,4 +1,5 @@
 from django.db import models
+from authentication.models import User
 
 
 class Category(models.Model):
@@ -10,41 +11,6 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-
-
-class Location(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    lat = models.FloatField(null=True)
-    lng = models.FloatField(null=True)
-
-    class Meta:
-        verbose_name = 'Локация'
-        verbose_name_plural = 'Локации'
-
-    def __str__(self):
-        return f'Location({self.name})'
-
-
-class User(models.Model):
-    ROLES = [
-        ('member', 'Участник',),
-        ('moderator', 'Модератор'),
-        ('admin', "Админ")
-    ]
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
-    username = models.CharField(max_length=20, null=False, unique=True)
-    password = models.CharField(max_length=20, null=False)
-    role = models.CharField(max_length=10, choices=ROLES, default='member')
-    age = models.IntegerField()
-    locations = models.ManyToManyField("Location")
-
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-
-    def __str__(self):
-        return f'User({self.username})'
 
 
 class Ad(models.Model):

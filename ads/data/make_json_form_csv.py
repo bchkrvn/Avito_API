@@ -33,5 +33,5 @@ def create_json(csv_path, json_path, model):
 
 create_json('ad.csv', 'ad.json', 'ads.ad')
 create_json('category.csv', 'category.json', 'ads.category')
-create_json('location.csv', 'location.json', 'ads.location')
-create_json('user.csv', 'user.json', 'ads.user')
+create_json('location.csv', 'location.json', 'authentication.location')
+create_json('user.csv', 'user.json', 'authentication.user')

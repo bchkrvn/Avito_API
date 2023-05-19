@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   db:
-    image: postgres:12.4-alpine
+    image: postgres:latest
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -11,7 +11,7 @@ services:
       POSTGRES_DB: hw_27
     restart: always
     ports:
-    - "5433:5432"
+    - "5432:5432"
 
 volumes:
   postgres_data:

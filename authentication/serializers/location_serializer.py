@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ads.models import Location
+from authentication.models import Location
 
 
 class LocationSerializers(serializers.ModelSerializer):
