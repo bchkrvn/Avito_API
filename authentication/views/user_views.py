@@ -24,9 +24,9 @@ class UsersGenericViewSet(viewsets.GenericViewSet):
     default_serializer = UserListSerializer
 
     def get_permissions(self):
-        if self.action in ['list']:
+        if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        elif self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
+        elif self.action in ['update', 'partial_update', 'destroy']:
             return [IsUser()]
         return super().get_permissions()
 
