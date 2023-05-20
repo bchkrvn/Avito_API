@@ -2,37 +2,7 @@ from rest_framework import serializers
 
 from authentication.models import User, Location
 from authentication.serializers.location_serializer import LocationSerializers
-from django.contrib.auth import views
 
-
-# class UserSerializer(serializers.ModelSerializer):
-#     id = serializers.CharField(read_only=True)
-#     password = serializers.CharField(write_only=True, max_length=20, required=True)
-#     role = serializers.CharField(write_only=True, max_length=10, required=True)
-#     locations = LocationSerializers(many=True, required=False)
-#     total_ads = serializers.IntegerField(read_only=True, required=False)
-#
-#     class Meta:
-#         model = User
-#         fields = '__all__'
-#         exclude = ['is_staff', 'is_active']
-#
-#     def is_valid(self, raise_exception=False):
-#         self._locations = self.initial_data.pop('locations') if 'locations' in self.initial_data else None
-#         return super().is_valid(raise_exception=raise_exception)
-#
-#     def save(self):
-#         user = super().save()
-#
-#         if self._locations is not None:
-#             user.locations.clear()
-#             for location in self._locations:
-#                 location_obj, _ = Location.objects.get_or_create(name=location)
-#                 user.locations.add(location_obj)
-#
-#         user.save()
-#         return user
-#
 
 class UserListSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -57,6 +27,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
 class UserCreateSerializer(serializers.ModelSerializer):
     locations = LocationSerializers(many=True, required=False)
+    password = serializers.CharField(write_only=True)
 
     def is_valid(self, raise_exception=False):
         self._locations = self.initial_data.pop('locations') if 'locations' in self.initial_data else None
@@ -78,9 +49,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'age', 'username', 'first_name', "last_name", 'email', 'locations', 'password']
-        read_only = ['id']
-        write_only = ['password']
-
+        read_only_fields = ['id']
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     locations = LocationSerializers(many=True, required=False)
@@ -103,8 +72,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'age', 'username', 'first_name', "last_name", 'email', 'locations', 'total_ads']
-        read_only = ['total_ads', 'id']
+        fields = ['id', 'age', 'username', 'first_name', "last_name", 'email', 'locations']
+        read_only_fields = ['total_ads', 'id']
 
 
 class UserChangePasswordSerializer(serializers.Serializer):
@@ -143,4 +112,3 @@ class UserChangePasswordSerializer(serializers.Serializer):
     def save(self, **kwargs):
         self.instance.set_password(self.validated_data['new_password'])
         self.instance.save()
-

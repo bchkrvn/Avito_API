@@ -19,12 +19,11 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include
 
-from authentication.views import user_views
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('ads.urls')),
-    path('', include('authentication.urls'))
+    path('', include('authentication.urls')),
+    path('', include('selections.urls'))
 ]
 
 if settings.DEBUG:

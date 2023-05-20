@@ -2,16 +2,18 @@ from django.db.models import Count, Q
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.models import User
+from authentication.permission import IsUser
 from authentication.serializers.user_serializer import UserListSerializer, \
     UserRetrieveSerializer, UserChangePasswordSerializer, UserUpdateSerializer, UserCreateSerializer
 
 
 class UsersGenericViewSet(viewsets.GenericViewSet):
-    queryset = User.objects.prefetch_related('locations').annotate(
+    queryset = User.objects.filter(is_active=True).prefetch_related('locations').annotate(
         total_ads=Count('ad', filter=Q(ad__is_published=True))).order_by('username').all()
     serializers = {
         "list": UserListSerializer,
@@ -20,6 +22,13 @@ class UsersGenericViewSet(viewsets.GenericViewSet):
         'partial_update': UserUpdateSerializer,
     }
     default_serializer = UserListSerializer
+
+    def get_permissions(self):
+        if self.action in ['list']:
+            return [IsAuthenticated()]
+        elif self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
+            return [IsUser()]
+        return super().get_permissions()
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.default_serializer)
@@ -62,6 +71,7 @@ class UserCreateView(CreateAPIView):
 class UserChangePasswordView(APIView):
     model = User
     serializer_class = UserChangePasswordSerializer
+    permission_classes = IsAuthenticated
 
     def post(self, request):
         user = request.user

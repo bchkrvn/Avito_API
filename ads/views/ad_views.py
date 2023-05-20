@@ -3,9 +3,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from ads.models import Ad
+from ads.permissions import IsOwner
 from ads.serializers.ad_serializer import AdSerializer
 
 
@@ -28,6 +30,13 @@ class AdImageUploadView(UpdateView):
 class AdGenericViewSet(viewsets.GenericViewSet):
     queryset = Ad.objects.select_related('author').select_related('category').all()
     serializer_class = AdSerializer
+
+    def get_permissions(self):
+        if self.action in ['retrieve', 'create']:
+            return [IsAuthenticated()]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [IsOwner()]
+        return super().get_permissions()
 
     def list(self, request):
         queryset = self.queryset.filter(is_published=True).order_by('-price')
