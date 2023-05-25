@@ -41,7 +41,7 @@ def moderator_token(db, client):
     response = client.post(
         '/users/token/',
         data,
-        format('json'),
+        format='json',
     )
 
     token = response.data['access']

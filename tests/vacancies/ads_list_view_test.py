@@ -14,7 +14,6 @@ class TestAdsListView:
 
         response = client.get(
             '/ads/',
-            # HTTP_AUTHORIZATION=user_token['token']
         )
 
         code = 200
