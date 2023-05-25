@@ -39,7 +39,7 @@ class SelectionGenericViewSet(viewsets.GenericViewSet):
 
     def create(self, request):
         data = request.data
-        data['owner'] = request.user.id
+        data['owner_id'] = request.user.id
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

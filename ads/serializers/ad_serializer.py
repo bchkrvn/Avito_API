@@ -39,6 +39,8 @@ class AdSerializer(serializers.ModelSerializer):
             return False
 
     def create(self, validated_data):
+        if 'is_published' in validated_data:
+            del validated_data['is_published']
         if 'author' not in validated_data:
             raise ValidationError("You don't send author id")
         if 'category' not in validated_data:

@@ -34,22 +34,20 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
     def create(self, validated_data):
-        user = super().create(validated_data=self.validated_data)
-
         if self._locations is not None:
-            user.locations.clear()
+            self.validated_data['locations'] = []
+
             for location in self._locations:
                 location_obj, _ = Location.objects.get_or_create(name=location)
-                user.locations.add(location_obj)
+                self.validated_data['locations'].append(location_obj.id)
 
-        user.set_password(self.validated_data['password'])
-        user.save()
-        return user
+        return super().create(validated_data=self.validated_data)
 
     class Meta:
         model = User
-        fields = ['id', 'age', 'username', 'first_name', "last_name", 'email', 'locations', 'password']
+        fields = ['id', 'username', 'first_name', "last_name", 'email', 'locations', 'password', 'birth_date']
         read_only_fields = ['id']
+
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     locations = LocationSerializers(many=True, required=False)
@@ -58,21 +56,31 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         self._locations = self.initial_data.pop('locations') if 'locations' in self.initial_data else None
         return super().is_valid(raise_exception=raise_exception)
 
-    def save(self):
-        user = super().save()
+    # def save(self):
+    #     user = super().save()
+    #
+    #     if self._locations is not None:
+    #         user.locations.clear()
+    #         for location in self._locations:
+    #             location_obj, _ = Location.objects.get_or_create(name=location)
+    #             user.locations.add(location_obj)
+    #
+    #     user.save()
+    #     return user
 
+    def save(self):
         if self._locations is not None:
-            user.locations.clear()
+            self.validated_data['locations'] = []
+
             for location in self._locations:
                 location_obj, _ = Location.objects.get_or_create(name=location)
-                user.locations.add(location_obj)
+                self.validated_data['locations'].append(location_obj.id)
 
-        user.save()
-        return user
+        return super().save()
 
     class Meta:
         model = User
-        fields = ['id', 'age', 'username', 'first_name', "last_name", 'email', 'locations']
+        fields = ['id', 'username', 'first_name', "last_name", 'email', 'locations', 'birth_date']
         read_only_fields = ['total_ads', 'id']
 
 
@@ -91,24 +99,24 @@ class UserChangePasswordSerializer(serializers.Serializer):
 
         return instance
 
-    def is_valid(self, raise_exception=False):
-        is_valid_ = super().is_valid(raise_exception=raise_exception)
+    # def is_valid(self, raise_exception=False):
+    #     is_valid_ = super().is_valid(raise_exception=raise_exception)
+    #
+    #     if not is_valid_:
+    #         return False
+    #
+    #     old_password = self.initial_data['old_password']
+    #     if self.instance.check_password(old_password):
+    #         return True
+    #     else:
+    #         errors = {"error": "You send wrong old password"}
+    #
+    #     if errors and raise_exception:
+    #         raise serializers.ValidationError(errors)
+    #
+    #     if errors:
+    #         return False
 
-        if not is_valid_:
-            return False
-
-        old_password = self.initial_data['old_password']
-        if self.instance.check_password(old_password):
-            return True
-        else:
-            errors = {"error": "You send wrong old password"}
-
-        if errors and raise_exception:
-            raise serializers.ValidationError(errors)
-
-        if errors:
-            return False
-
-    def save(self, **kwargs):
-        self.instance.set_password(self.validated_data['new_password'])
-        self.instance.save()
+    # def save(self, **kwargs):
+    #     self.instance.set_password(self.validated_data['new_password'])
+    #     self.instance.save()

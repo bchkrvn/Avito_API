@@ -39,7 +39,7 @@ class AdGenericViewSet(viewsets.GenericViewSet):
         return super().get_permissions()
 
     def list(self, request):
-        queryset = self.queryset.filter(is_published=True).order_by('-price')
+        queryset = self.queryset.order_by('-price')
 
         category = request.GET.get('cat')
         text = request.GET.get('text')
@@ -66,7 +66,9 @@ class AdGenericViewSet(viewsets.GenericViewSet):
         return Response(serializer.data, status=200)
 
     def create(self, request):
-        serializer = self.get_serializer(data=request.data)
+        data = request.data
+        data['author_id'] = request.user.id
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)

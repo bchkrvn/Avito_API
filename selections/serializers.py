@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from ads.models import Ad
 from ads.serializers.ad_serializer import AdSerializer
+from authentication.models import User
 from authentication.serializers.user_serializer import UserListSerializer
 from selections.models import Selection
 
@@ -25,6 +26,8 @@ class SelectionDetailSerializer(serializers.ModelSerializer):
 
 class SelectionCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
+    owner = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    owner_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Selection

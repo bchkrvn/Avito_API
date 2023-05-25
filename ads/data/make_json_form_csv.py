@@ -1,4 +1,5 @@
 import csv
+import datetime
 import json
 
 
@@ -24,6 +25,13 @@ def create_json(csv_path, json_path, model):
                 object_dict['fields']['locations'] = list()
                 object_dict['fields']['locations'].append(int(object_dict['fields']['location_id']))
                 del object_dict['fields']['location_id']
+
+            if model == 'ads.category':
+                object_dict['fields']['slug'] = f'slug_{object_dict["pk"]}'
+
+            if model == 'authentication.user':
+                object_dict['fields']['birth_date'] = datetime.date(2000, 1, 1).strftime('%Y-%m-%d')
+                object_dict['fields']['email'] = f"{object_dict['fields']['username']}@mail.ru"
 
             result.append(object_dict)
 
