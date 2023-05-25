@@ -15,6 +15,7 @@ Avito API
 * GenericViewSet
 * ModelViewSet
 * SimpleJWT
+* PyTest
 
 Запуск проекта:
 -
@@ -30,3 +31,5 @@ Avito API
 `python3 manage.py loaddata ads/fixtures/ad.json`
 4) Для запуска сервера выполните команду:  
 `python3 manage.py runserver`
+5) Для запуска тестов выполните команду:  
+`pytest`
